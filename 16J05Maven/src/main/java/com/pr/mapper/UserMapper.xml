@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pr.mapper.UserMapper">
+	<resultMap type="com.pr.pojo.User" id="userMap">
+		<id column="id" property="id" javaType="java.lang.Integer" />
+		<result column="name" property="name"
+			javaType="java.lang.String" />
+		<result column="pwd" property="pwd" javaType="java.lang.String" />
+		<result column="sex" property="sex" javaType="java.lang.String" />
+		<result column="age" property="age" javaType="java.lang.String" />
+		<result column="phone" property="phone"
+			javaType="java.lang.String" />
+	</resultMap>
+	<sql id="userAll">id,name,pwd,sex,age,phone</sql>
+	<insert id="insert" parameterType="User">
+		insert into
+		tb_user(name,pwd,sex,age,phone)
+		values(#{name},#{pwd},#{sex},#{age},#{phone})
+	</insert>
+	<select id="findUserByName" parameterType="String"
+		resultType="User">
+		select
+		<include refid="userAll" />
+		from tb_user where name=#{name}
+	</select>
+	<select id="login" parameterType="User" resultType="User">
+		select
+		name,pwd from tb_user where name=#{name} and pwd=#{pwd}
+	</select>
+	<select id="findByAll" resultMap="userMap">
+		select
+		<include refid="userAll" />
+		from tb_user
+	</select>
+	<delete id="deleteUserById" parameterType="int">
+		delete from tb_user
+		where id=#{id}
+	</delete>
+	<select id="findUserById" parameterType="Integer"
+		resultType="User">
+		select
+		<include refid="userAll" />
+		from tb_user where id=#{id}
+	</select>
+	<update id="updateUserById" parameterType="User">
+		update tb_user
+		<set>
+			<if test="name!=null and name!=''">
+				name=#{name},
+			</if>
+			<if test="pwd!=null and pwd!=''">
+				pwd=#{pwd},
+			</if>
+			<if test="sex!=null and sex!=''">
+				sex=#{sex},
+			</if>
+			<if test="age!=null and age!=''">
+				age=#{age},
+			</if>
+			<if test="phone!=null and phone!=''">
+				phone=#{phone}
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	<select id="findUserByProperty" parameterType="User"
+		resultType="User">
+		select
+		<include refid="userAll" />
+		from tb_user
+		<where>
+			<if test="name!=null and name!=''">
+				and name=#{name}
+			</if>
+			<if test="sex!=null and sex!=''">
+				and sex=#{sex}
+			</if>
+			<if test="age!=null and age!=''">
+				and age=#{age}
+			</if>
+			<if test="phone!=null and phone!=''">
+				and phone=#{phone}
+			</if>
+		</where>
+	</select>
+	<sql id="queryCondition">
+		<where>
+			<if test="name!=null and name!=''">
+				and name like concat('%',#{name},'%')
+			</if>
+			<if test="sex!=null and sex!=''">
+				and sex=#{sex}
+			</if>
+			<if test="age!=null and age!=''">
+				and age=#{age}
+			</if>
+			<if test="phone!=null and phone!=''">
+				and phone=#{phone}
+			</if>
+		</where>
+	</sql>
+	<select id="pageFindAll" parameterType="map" resultType="User">
+		select
+		<include refid="userAll"></include>
+		from tb_user
+		<include refid="queryCondition"></include>
+		limit #{start},#{end}
+	</select>
+	<select id="totalNum" resultType="Integer" parameterType="User">
+		select count(*) from tb_user <include refid="queryCondition"></include>
+	</select>
+
+</mapper>
